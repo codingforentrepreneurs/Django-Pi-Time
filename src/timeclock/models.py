@@ -30,5 +30,9 @@ class UserActivity(models.Model):
     def __str__(self):
         return str(self.activity)
 
+    class Meta:
+        verbose_name = 'User Activity'
+        verbose_name_plural = "User Activities"
+
 
 
