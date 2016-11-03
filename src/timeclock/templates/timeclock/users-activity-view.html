@@ -1,0 +1,10 @@
+
+<h1>All Activity</h1>
+
+<ul>
+{% for obj in all_activity %}
+
+<li>{{ obj.user.username }} - {{ obj.activity }} - {{ obj.timestamp | timesince }} </li>
+
+{% endfor %}
+</ul>

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime, time
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -19,11 +19,39 @@ USER_ACTIVITY_CHOICES = (
         ('checkout', 'Check Out'),
     )
 
+class UserActivityQuerySet(models.query.QuerySet):
+    def today(self):
+        now = timezone.now()
+        today_start = timezone.make_aware(datetime.combine(now, time.min))
+        today_end  = timezone.make_aware(datetime.combine(now, time.max))
+        return self.filter(timestamp__gte=today_start).filter(timestamp__lte=today_end)
+
+    def checkin(self,):
+        return self.filter(activity='checkin')
+
+    def checkout(self,):
+        return self.filter(activity='checkout')
+
+
+    def current(self, user=None):
+        if user is None:
+            return self
+        return self.filter(user=user).order_by('-timestamp').first()
+
 class UserActivityManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        return UserActivityQuerySet(self.model, using=self._db)
+
+    def checkin(self):
+        return self.get_queryset().checkin()
+
+    def checkout(self):
+        return self.get_queryset().checkout()
+
     def current(self, user=None):
         if user is None:
             return None
-        current_obj = self.get_queryset().filter(user=user).order_by('-timestamp').first()
+        current_obj = self.get_queryset().current(user)
         return current_obj
 
     def toggle(self, user=None):

@@ -1,11 +1,32 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 
 
+
 from .forms import LoginForm, UserActivityForm
 from .models import UserActivity
+
+User = get_user_model()
+
+
+class UsersActivityView(View):
+    def get(self, request, *args, **kwargs):
+        print(UserActivity.objects.checkin().count())
+        print(UserActivity.objects.checkin().today().count())
+        queryset_list = User.objects.all()
+        checked_in_list = []
+        for u in queryset_list:
+            #act = UserActivity.objects.current(u)
+            act = u.useractivity_set.checkin().order_by("-timestamp").today().first()
+            print(act)
+
+        #checked_in =  UserActivity.objects.filter(activity='checkin').order_by("-timestamp")
+        context = {
+            "queryset_list": queryset_list
+        }
+        return render(request, "timeclock/users-activity-view.html", context)
 
 
 # LOGIN REQUIRED
