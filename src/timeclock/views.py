@@ -1,7 +1,10 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 
 
@@ -13,6 +16,10 @@ User = get_user_model()
 
 
 class UsersActivityView(View):
+    @method_decorator(staff_member_required)
+    def dispatch(self, *args, **kwargs):
+        return super(UsersActivityView, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         query = request.GET.get("q")
         users = User.objects.all()
@@ -54,12 +61,12 @@ class UsersActivityView(View):
         return render(request, "timeclock/users-activity-view.html", context)
 
 
-# LOGIN REQUIRED
 class ActivityView(View):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ActivityView, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect("/login/")
-        
         if request.session.get("username"):
             username_auth = request.user.username
             username_ses = request.session.get("username")
@@ -97,6 +104,7 @@ class UserLoginView(View):
         return render(request, "timeclock/login-view.html", context)
 
     def post(self, request, *args, **kwargs):
+        next_url = request.GET.get("next")
         form = LoginForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get("username")
@@ -105,6 +113,8 @@ class UserLoginView(View):
             if user is not None:
                 login(request, user)
                 request.session['username'] = username
+            if next_url:
+                return HttpResponseRedirect(next_url)
             return HttpResponseRedirect("/")
         context = {"form": form}
         return render(request, "timeclock/login-view.html", context)
