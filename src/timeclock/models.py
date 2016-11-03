@@ -1,18 +1,12 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.utils import timezone
 
-# Create your models here.
 
-# 1. Users
-# 2. Daily Time Clock
-# 3. In and Out per Day
-
-# class UserDayTime(models.Model):
-#     user =  models.ForeignKey(settings.AUTH_USER_MODEL)
-#     today = models.DateField(default=timezone.now)
-
+# https://docs.djangoproject.com/en/1.10/ref/exceptions/#django.core.exceptions.ValidationError
+# Django Models Unleashed on http://joincfe.com
 
 USER_ACTIVITY_CHOICES = (
         ('checkin', 'Check In'),
@@ -33,6 +27,33 @@ class UserActivity(models.Model):
     class Meta:
         verbose_name = 'User Activity'
         verbose_name_plural = "User Activities"
+
+
+    def clean(self, *args, **kwargs):
+        if self.user:
+            user_activites = UserActivity.objects.exclude(
+                                id=self.id
+                            ).filter(
+                                user = self.user
+                            ).order_by('-timestamp')
+            if user_activites.exists():
+                recent_ = user_activites.first()
+                if self.activity == recent_.activity:
+                    message = "%s is not a valid activity for this user" %(self.get_activity_display())
+                    raise ValidationError(message)
+                # check if timestamp is gte 10 minutes
+            else:
+                if self.activity != "checkin":
+                    message = "%s is not a valid activity for this user as a first activity." %(self.get_activity_display())
+                    raise ValidationError(message)
+
+        return super(UserActivity, self).clean(*args, **kwargs)
+
+
+
+
+
+
 
 
 
