@@ -19,11 +19,12 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
-from timeclock.views import ActivityView, UserLogoutView
+from timeclock.views import ActivityView, UserLogoutView, UserLoginView
 
 
 urlpatterns = [
     url(r'^$', ActivityView.as_view()),
+    url(r'^login/$', UserLoginView.as_view()),
     url(r'^logout/$', UserLogoutView.as_view()),
     url(r'^admin/', admin.site.urls),
 ]

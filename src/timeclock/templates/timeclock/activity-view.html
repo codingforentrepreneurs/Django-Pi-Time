@@ -10,4 +10,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <input type='submit' value='{% if object2 %}{{object.next_activity }}{% else %}Check in{% endif %}' />
+
 </form>
+
+<p>Not {{ object.user.username }}? <a href='/logout'>Logout</a></p>

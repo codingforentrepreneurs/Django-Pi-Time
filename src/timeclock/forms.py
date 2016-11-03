@@ -6,6 +6,25 @@ User = get_user_model()
 
 # http://joincfe.com/projects forms and formsets
 
+class UserActivityForm(forms.Form):
+    username = forms.CharField(widget=forms.HiddenInput)
+    password = forms.CharField(label='Verify Password', widget=forms.PasswordInput)
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super(UserActivityForm, self).clean(*args, **kwargs)
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+        qs = User.objects.filter(username__iexact=username)
+        if not qs.exists() or qs.count() != 1:
+            raise forms.ValidationError("This password is incorrect")
+        else:
+            user_obj = qs.first()
+            if not user_obj.check_password(password):
+                raise forms.ValidationError("This password is incorrect")
+        return cleaned_data
+
+
+
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
