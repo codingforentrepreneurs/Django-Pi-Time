@@ -1,8 +1,14 @@
+from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.utils import timezone
+
+
+
+ACTIVITY_TIME_DETLA = getattr(settings, "ACTIVITY_TIME_DETLA", timedelta(minutes=1)) 
+
 
 
 # https://docs.djangoproject.com/en/1.10/ref/exceptions/#django.core.exceptions.ValidationError
@@ -26,8 +32,10 @@ class UserActivityManager(models.Manager):
         last_item = self.current(user)
         activity = "checkin"
         if last_item is not None:
-            # if last_item.timestamp <= datetime.datetime.now():
-            #     pass
+            now = timezone.now()
+            diff = last_item.timestamp + ACTIVITY_TIME_DETLA
+            if diff > now:
+                return None
             if last_item.activity == "checkin":
                 activity = "checkout"
         obj = self.model(

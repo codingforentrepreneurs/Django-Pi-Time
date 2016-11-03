@@ -9,7 +9,7 @@
 <form method='POST' action=''>
     {% csrf_token %}
     {{ form.as_p }}
-    <input type='submit' value='{% if object2 %}{{object.next_activity }}{% else %}Check in{% endif %}' />
+    <input type='submit' value='{% if object %}{{object.next_activity }}{% else %}Check in{% endif %}' />
 
 </form>
 
