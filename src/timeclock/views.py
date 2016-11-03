@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
@@ -13,6 +14,7 @@ User = get_user_model()
 
 class UsersActivityView(View):
     def get(self, request, *args, **kwargs):
+        query = request.GET.get("q")
         users = User.objects.all()
         checked_in_list = []
         checked_out_list = []
@@ -34,11 +36,20 @@ class UsersActivityView(View):
         checked_in_users = all_activity.filter(id__in=checked_in_list)
         checked_out_users = all_activity.filter(id__in=checked_out_list)
         all_activity = all_activity.today().recent()
+
+        if query:
+            checked_in_users = checked_in_users.filter(user__username__iexact=query)
+            checked_out_users = checked_out_users.filter(user__username__iexact=query)
+            all_activity = all_activity.filter(
+                    Q(user__username__iexact=query) |
+                    Q(user__first_name__iexact=query)
+                    )
         context = {
             "checked_in_users": checked_in_users,
             "checked_out_users": checked_out_users,
             "inactive_users": no_activity_today_users,
             "all_activity": all_activity,
+            "query": query,
         }
         return render(request, "timeclock/users-activity-view.html", context)
 
