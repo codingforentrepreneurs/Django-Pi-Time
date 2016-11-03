@@ -20,6 +20,9 @@ USER_ACTIVITY_CHOICES = (
     )
 
 class UserActivityQuerySet(models.query.QuerySet):
+    def recent(self):
+        return self.order_by("-timestamp")
+
     def today(self):
         now = timezone.now()
         today_start = timezone.make_aware(datetime.combine(now, time.min))
@@ -31,7 +34,6 @@ class UserActivityQuerySet(models.query.QuerySet):
 
     def checkout(self,):
         return self.filter(activity='checkout')
-
 
     def current(self, user=None):
         if user is None:
@@ -90,6 +92,7 @@ class UserActivity(models.Model):
     class Meta:
         verbose_name = 'User Activity'
         verbose_name_plural = "User Activities"
+        #ordering = ['-timestamp']
 
     @property
     def next_activity(self):

@@ -13,18 +13,32 @@ User = get_user_model()
 
 class UsersActivityView(View):
     def get(self, request, *args, **kwargs):
-        print(UserActivity.objects.checkin().count())
-        print(UserActivity.objects.checkin().today().count())
-        queryset_list = User.objects.all()
+        users = User.objects.all()
         checked_in_list = []
-        for u in queryset_list:
-            #act = UserActivity.objects.current(u)
-            act = u.useractivity_set.checkin().order_by("-timestamp").today().first()
-            print(act)
-
-        #checked_in =  UserActivity.objects.filter(activity='checkin').order_by("-timestamp")
+        checked_out_list = []
+        no_activity_today_users = []
+        all_activity = UserActivity.objects.all()
+        for u in users:
+            act = all_activity.filter(user=u).today().recent()
+            # act = u.useractivity_set.all().today()
+            if act.exists():
+                current_user_activity_obj = act.first()
+                if current_user_activity_obj.activity == 'checkin':
+                    checked_in_list.append(current_user_activity_obj.id)
+                else:
+                    checked_out_list.append(current_user_activity_obj.id)
+            else:
+                no_activity_today_users.append(u)
+        
+        #all_activity = UserActivity.objects.all().today().recent()
+        checked_in_users = all_activity.filter(id__in=checked_in_list)
+        checked_out_users = all_activity.filter(id__in=checked_out_list)
+        all_activity = all_activity.today().recent()
         context = {
-            "queryset_list": queryset_list
+            "checked_in_users": checked_in_users,
+            "checked_out_users": checked_out_users,
+            "inactive_users": no_activity_today_users,
+            "all_activity": all_activity,
         }
         return render(request, "timeclock/users-activity-view.html", context)
 

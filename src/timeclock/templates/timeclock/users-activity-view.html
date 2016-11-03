@@ -1,6 +1,36 @@
 
 <h1>All Activity</h1>
 
+<h3>Checked in users</h3>
+<ul>
+{% for obj in checked_in_users %}
+
+<li>{{ obj.user.username }} - {{ obj.timestamp | timesince }} </li>
+
+{% endfor %}
+</ul>
+
+<h3>Checked out Users</h3>
+<ul>
+{% for obj in checked_out_users %}
+
+<li>{{ obj.user.username }} - {{ obj.timestamp | timesince }} </li>
+
+{% endfor %}
+</ul>
+
+
+<h3>Inactive Users</h3>
+<ul>
+{% for obj in inactive_users %}
+
+<li>{{ obj.username }} </li>
+
+{% endfor %}
+</ul>
+
+
+<h3>All Activity</h3>
 <ul>
 {% for obj in all_activity %}
 
@@ -8,3 +38,4 @@
 
 {% endfor %}
 </ul>
+
