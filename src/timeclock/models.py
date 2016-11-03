@@ -13,10 +13,37 @@ USER_ACTIVITY_CHOICES = (
         ('checkout', 'Check Out'),
     )
 
+class UserActivityManager(models.Manager):
+    def current(self, user=None):
+        if user is None:
+            return None
+        current_obj = self.get_queryset().filter(user=user).order_by('-timestamp').first()
+        return current_obj
+
+    def toggle(self, user=None):
+        if user is None:
+            return None
+        last_item = self.current(user)
+        activity = "checkin"
+        if last_item is not None:
+            # if last_item.timestamp <= datetime.datetime.now():
+            #     pass
+            if last_item.activity == "checkin":
+                activity = "checkout"
+        obj = self.model(
+                user=user,
+                activity = activity
+            )
+        obj.save()
+        return obj
+
 class UserActivity(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     activity = models.CharField(max_length=120, default='checkin', choices=USER_ACTIVITY_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    objects = UserActivityManager()
+    abc = UserActivityManager()
 
     def __unicode__(self):
         return str(self.activity)
