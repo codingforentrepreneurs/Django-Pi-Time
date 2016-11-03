@@ -10,12 +10,15 @@ from .models import UserActivity
 class ActivityView(View):
     def get(self, request, *args, **kwargs):
         # current activity
-        return render(request, "timeclock/activity-view.html", {})
+        obj = UserActivity.objects.current(request.user)
+        return render(request, "timeclock/activity-view.html", {"object": obj})
 
     def post(self, request, *args, **kwargs):
+        context = {}
         if request.user.is_authenticated():
-            new_act = UserActivity.objects.create(user=request.user, activity='checkin')
-        return render(request, "timeclock/activity-view.html", {})
+            toggle = UserActivity.objects.toggle(request.user)
+            context['object'] = toggle
+        return render(request, "timeclock/activity-view.html", context)
 
 
 

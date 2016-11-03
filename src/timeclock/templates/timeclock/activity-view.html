@@ -1,7 +1,13 @@
 <h1>User Activity</h1>
 
+{% if object %}
+
+    <h1>Currently: {{ object.current }}</h1>
+    <p>Updated: {{ object.timestamp }}</p>
+{% endif %}
+
 <form method='POST' action=''>
     {% csrf_token %}
 
-    <input type='submit' value='Do Activity' />
+    <input type='submit' value='{% if object %}{{object.next_activity }}{% else %}Check in{% endif %}' />
 </form>

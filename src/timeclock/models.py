@@ -55,6 +55,20 @@ class UserActivity(models.Model):
         verbose_name = 'User Activity'
         verbose_name_plural = "User Activities"
 
+    @property
+    def next_activity(self):
+        next = "Check in"
+        if self.activity == 'checkin':
+            next = "Check out"
+        return next
+
+    @property
+    def current(self):
+        current = 'Checked Out'
+        if self.activity == 'checkin':
+            current = "Checked in"
+        return current
+
 
     def clean(self, *args, **kwargs):
         if self.user:
