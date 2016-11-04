@@ -39,3 +39,7 @@ Django Pi Time is a Django project built for the Raspberry Pi to log user check-
 [17 - Users Activity View Part 3](../../tree/294dcd47cbae6f88e814629a7b259c22330230cc)
 
 [18 - Decorators for Login & Staff Required](../../tree/1926021bec8093d02a8ea709084d6a6826137a8c)
+
+[19 - Integrate Bootstrap](../../tree/73dc9753e7d1535a476806b0b1b68af670bb4521)
+
+[20 - Thank you](../../tree/73dc9753e7d1535a476806b0b1b68af670bb4521)
