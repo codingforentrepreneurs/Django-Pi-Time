@@ -1,10 +1,19 @@
+{% extends "base.html" %}
+
+
+
+ {% block content %}
+
+<h1>All Activity</h1>
+
+
 <form method='GET' action=''>
-<input type='text' name='q' placeholder='Username' value='{{ request.GET.q }}'/>
-<input type='submit' value='Search'/>
+<input class='form-control' type='text' name='q' placeholder='Username' value='{{ request.GET.q }}'/>
+<input class='btn btn-default' type='submit' value='Search'/>
 </form>
 
 
-<h1>All Activity</h1>
+
 
 <h3>Checked in users</h3>
 <ul>
@@ -44,3 +53,4 @@
 {% endfor %}
 </ul>
 
+    {% endblock %}
